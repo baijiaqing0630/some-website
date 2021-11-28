@@ -1,0 +1,280 @@
+<html>
+<head>
+<title>一些网站1.0.2</title>
+</head>
+<body>
+<body class="language-cpp" style="background-size: cover; background-image: url('/Content/Images/Backgrounds/Uploads/baijiaqing.jpg')">
+<link href="/Styles/PageStyles/HomeIndex.css" rel="stylesheet" />
+
+    <div class="ts_context bg-white ">
+                
+
+<link href="/Styles/PageStyles/DiscussionIndex.css" rel="stylesheet" />
+
+
+
+
+<!--列表 开始-->
+<table class="table list-hover" id="showDiv" style="margin-bottom: 0; margin-top: 10px; table-layout: fixed">
+    <tr>
+        
+        <th style="width: 10%" class="hidden-sm hidden-xs">
+            类别
+        </th>
+        <th style="width: 50%">
+            标题
+        </th>
+        <th class="hidden-sm hidden-xs" style="width: 140px">
+            更新时间
+        </th>
+        <th>
+            用户名
+        </th>
+        <th id="ThReplies">
+            回复数
+        </th>
+        <th class="hidden-xs">
+            最近回复
+        </th>
+    </tr>
+</table>
+<!--列表 结束-->
+<!--追加按钮 开始-->
+<div id="load_more" class="text-center pointer any-more">
+</div>
+<div id="no_more" class="text-center any-more" style="display: none;">
+    共找到 <span id="rec_cnt">0</span> 项记录
+</div>
+<!--追加按钮 结束-->
+<!--表项追加逻辑 开始-->
+<script language="javascript" type="text/javascript">
+    $(function() {
+        var firstTime = 1;
+        var PageIndex = 0;
+        var PageSize = 13;
+        var SelfName = "baijiaqing";
+        var TypeValue=2;
+        
+        var ContestId=1590;
+        
+
+        function getAndAppend() {
+            $.getJSON(
+                "/zh/Discussion/LoadMore",
+                {
+                    pindex: PageIndex,
+                    psize: PageSize
+                    , tval: TypeValue
+                    
+                    , cid: ContestId
+                    
+                },
+                function(data) {
+                    var dataLength = data.length;
+                    $("#rec_cnt").text(parseInt($("#rec_cnt").text()) + dataLength);
+                    if (dataLength < PageSize) {
+                        $("#load_more").hide();
+                        $("#no_more").show();
+                        if (dataLength == 0) return;
+                    }
+                    
+                    var BuNa = ['Sparrow','rgnoH','OBlack','zzzrrr','deaf','CQXYM','Grhonbus','bukuishiwo2333','fyz216','8xiongjunxiang'] ;
+                    var strLoaded = "";
+                    for (var i = 0; i < dataLength; i++) {
+                        PageIndex++;
+                        var tdBadge = "";
+
+                        if (data[i].ContestId) {
+                            tdBadge = '<span class="badge badge-contest hidden-sm hidden-xs">C' + data[i].ContestId + ' ' + data[i].ContestTitle + '</span>';
+                            if (data[i].ProblemId) {
+                                tdBadge += '<span class="badge badge-temporary hidden-sm hidden-xs">' + data[i].ProblemId + '</span>';
+                            }
+                        } else
+                            if (data[i].ProblemId) {
+                                tdBadge = '<span class="badge badge-problem hidden-sm hidden-xs">P' + data[i].ProblemId + ' ' + data[i].ProblemTitle +'</span>';
+                            }
+
+                        var tdType = data[i].Type == 1 ? "题解" :
+                                     data[i].Type == 2 ? "问题" :
+                                     data[i].Type == 3 ? "<span class='label label-info' style='background:#DC647B'>公告</span>" :
+                                     "题解";
+
+                        var returnurl = escape('/zh/Discussion?type=question&cid=1590&entry=cont');
+                        var display_name = "<a title='" + data[i].RealName + "' class='link-default' " + 
+                            "href='/zh/Statistic/Profile/?name=" + data[i].UserName + "'>" + 
+                            (BuNa.indexOf(data[i].UserName) >= 0 ? "<span name='blink'>" : "") + 
+                            (SelfName == data[i].UserName ? "<b>" : "") + 
+                            data[i].UserName +
+                            (SelfName == data[i].UserName ? "</b>" : "") + 
+                            (BuNa.indexOf(data[i].UserName) >= 0 ? "</span>" : "") + 
+                            "</a>";
+
+                        strLoaded +=
+                            "<tr class='text-center pointer' onclick=\"open_link('/zh/Discussion/Details?type=question&amp;entry=cont&amp;show=1&id=" + data[i].Id + "')\">" +
+                            //"<td class='hidden-sm hidden-xs'>" + data[i].Id + "</td>" +
+                            "<td class='hidden-sm hidden-xs'>" + tdType + "</td>" +
+                            "<td class='td-badge td-ctrl'>" + tdBadge + data[i].Title + "</td>" +
+                            "<td class='hidden-sm hidden-xs td-ctrl'>" + data[i].UpdateTime + "</td>" +
+                            "<td class='td-ctrl'>" + display_name + "</td>" +
+                            "<td>" + data[i].Replies + "</td>" +
+                            "<td class='hidden-xs td-ctrl'><a class='" + (SelfName == data[i].RepliedBy ? "" : "link-default") + "' href='/zh/Statistic/Profile?name=" + data[i].RepliedBy + "'>" + data[i].RepliedBy + "</a></td>" +
+
+                            "</tr>";
+                    }
+                    var newTable = $(strLoaded);
+                    if (!firstTime) newTable.hide();
+                    $("#showDiv").append(newTable);
+                    if (!firstTime) {
+                        newTable.stop(!0, !0).fadeTo(500, 1.0);
+                        $(".main_panel").scrollTop($(".main_panel").scrollTop() + $(".main_panel")[0].offsetHeight - 100);
+                    } else firstTime = 0;
+                });
+        }
+
+        $("#load_more").click(function() {
+            getAndAppend();
+        }
+        );
+        getAndAppend();
+    });
+</script>
+<!--表项追加逻辑 结束-->
+<form action="/zh/Discussion/Create" method="post">        <link href="/Styles/PageStyles/DiscussionDetails.css" rel="stylesheet" />
+        <div class="form-horizontal">
+            <input name="__RequestVerificationToken" type="hidden" value="4XDDbIIiEyLDdYaUNHdolBwr8QrBIboc2SPbz0Uu2HZ1gfDxUENNpRm6ES4gAXZYhOIU5kgczDoO6Jhm6sV8f8rwDkIAC4BDIR1TUeFkNheCqzZfVn_ZfBSNjVZYBEibVC8y8Pfop4gAsqvXnCnJWQ2" />
+            <input data-val="true" data-val-number="字段 ParentId 必须是一个数字。" id="ParentId" name="ParentId" type="hidden" value="" />
+            <input type="hidden" name="Cid" value="1590" />
+            <input type="hidden" name="Pid" />
+            <input type="hidden" name="Tid" />
+            <input type="hidden" name="Entry" value="cont" />
+            <input type="hidden" name="Type" value="2" />
+            <input type="hidden" name="ContestId" value="1590" />
+            <input type="hidden" name="ProblemId" />
+            <input type="hidden" name="TemporaryId" />
+
+            <div class="quick-topic form-group">
+                <div class="col-md-2 control-label">
+                    标题
+                </div>
+                <div class="col-md-10">
+                    <input autocomplete="off" class="form-control required" data-val="true" data-val-length="字段 标题 必须是最大长度为 50 的字符串。" data-val-length-max="50" id="Title" name="Title" style="max-width:320px;display: inline;margin-right:10px;" type="text" value="" />
+                    <input type="submit" value="发表" id="BtnSubmitUpper"
+                           class="btn btn-default" style="vertical-align: top;" />
+                </div>
+            </div>
+
+            <div class="quick-topic form-group">
+                <div class="col-md-2 control-label">
+                    内容
+                </div>
+                <div class="col-md-10">
+                    <textarea class="form-control required" cols="20" data-val="true" data-val-required="内容 字段是必需的。" id="Detail" name="Detail" rows="2" style="height:200px;width:400px;max-width:100%;display: inline">
+</textarea>
+                </div>
+            </div>
+
+            <input type="submit" value="出现BUG，请不要点击！！！" id="BtnSubmitLower" class="btn btn-default" />
+        </div>
+</form>    <script language="javascript" type="text/javascript">
+        $(function () {
+            $("form").validate();
+        });
+    </script>
+    <!--StackEdit textarea-->
+    <script src="/Scripts/stackedit.min.js"></script>
+    <script src="/Scripts/textarea.js"></script>
+
+            </div>
+        </div><!--主面板 结束-->  
+ </div>
+
+    <!--JS代码 开始-->
+    <div id="outdated"></div>
+    <script src="/Scripts/Site.js"></script>
+    <script>
+    addLoadEvent(function () {
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'transform',
+            languagePath: '/Content/OutdatedBrowser/lang/zh.html'
+        })
+    });
+    </script>
+
+    <script src="/Scripts/stupidtable.min.js"></script>
+    <script type="text/javascript">
+    $(function() {
+        $("table").stupidtable();
+
+    });
+    </script>
+    
+
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "//hm.baidu.com/hm.js?e0a4bdbf979e1fd70bf5aa44cbab118d";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+    <script src="/Scripts/prism.js"></script>      
+
+<br>
+<br>
+<br>
+<a href="https://www.luogu.com.cn/discuss/378634">网站讨论版</a>
+<div class="alert alert-info" role="alert" style="padding: 7px 10px; margin-bottom:  8px">
+                    道阻且长,行则将至,行而不辍,未来可期。 (2021-11-07)
+            </div>
+<img style="media-object img-transparent-link" src="http://oi.nks.edu.cn/Content/Images/Avatars/Uploads/baijiaqing.png" alt style="width: 50px; height: 50px; max-width:50px; max-height:50px;">
+<div class="ts_context bg-white ">
+                
+
+<link href="/Styles/PageStyles/ProblemDetails.css" rel="stylesheet"/>
+
+
+
+
+<table id="TitleContainer">
+    <tr>
+        <td id="TdMainTitle" class="text-center">
+            <span class="label label-info label_pid" style=font-size:11.5px>跳转界面</span><span style="margin-left: 10px;margin-right:15px;">一些网址</span>
+        </td>
+    </tr>
+    <tr>
+        <td id="TdSubTitle">
+            <table id="TblLimits">
+                <tr>
+                    <td>
+                        <span class="short-text">警告 : </span><span class="long-text">禁止用此网站 进行不正当行为</span><span style="color: #449bb6;"></span>&nbsp;&nbsp;
+                        <tr>
+			<span class="long-text"></span><span style="color: #449bb6;">违者必究</span>
+                                            </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+<a href="http://oi.nks.edu.cn">NKOJ</a>
+<br>
+<a href="http://www.xnyrzs.com/index.php">ZQOJ</a>
+<br>
+<a href="http://www.luogu.com.cn">luogu</a>
+<br>
+<a href="http://www.bashu.com.cn/xx">bashu</a>
+<div class="well well-prob">
+<p>接下来是一些与学术无关的东西</p>
+<a href="http://www.baidu.com">baidu</a>
+<br>
+<a href="http://www.minecraft.net">minecraft</a>
+<br>
+<a href="http://www.bilibili.com">bilibili</a>
+<br>
+<a href="http://www.yorg.io">yorg</a>
+</div>
+    <span id="SpanAuthor">Designed by <a href="http://oi.nks.edu.cn/zh/Statistic/Profile?self=1">白嘉庆</a></span>
+</body>
+</html>
